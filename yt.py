@@ -191,39 +191,38 @@ def read_urls_from_file(file_path):
         sys.exit(1)
 
 def load_cookies(driver):
-    if os.path.exists(COOKIE_FILE) and os.path.getsize(COOKIE_FILE) > 0:    
-        try:
-            # with open(COOKIE_FILE, "r") as file:
-            #     cookies = json.load(file)
-            cookies = json.load(os.environ.get('COOKIES'))
+   
+    try:
+        # with open(COOKIE_FILE, "r") as file:
+        #     cookies = json.load(file)
+        cookies = json.load(os.environ.get('COOKIES'))
 
-            driver.uc_open("https://www.youtube.com")  # Ensure correct domain is loaded before adding cookies
-            wait_for_page_load(driver)
+        driver.uc_open("https://www.youtube.com")  # Ensure correct domain is loaded before adding cookies
+        wait_for_page_load(driver)
+        
+        valid_domain = ".youtube.com"
+
+        for cookie in cookies:
+            if "domain" in cookie and valid_domain not in cookie["domain"]:
+                print(f"Skipping cookie {cookie['name']} due to domain mismatch.")
+                continue  # Skip invalid domain cookies
             
-            valid_domain = ".youtube.com"
-
-            for cookie in cookies:
-                if "domain" in cookie and valid_domain not in cookie["domain"]:
-                    print(f"Skipping cookie {cookie['name']} due to domain mismatch.")
-                    continue  # Skip invalid domain cookies
-                
-                if "sameSite" not in cookie or cookie["sameSite"] not in ["Strict", "Lax", "None"]:
-                    cookie["sameSite"] = "Lax"
-                
-                if "expiry" not in cookie:
-                    cookie["expiry"] = int(time.time()) + 3600 * 24 * 30  # 30 days expiry
-
-                try:
-                    driver.add_cookie(cookie)
-                except Exception as e:
-                    print(f"Failed to add cookie {cookie.get('name', 'unknown')}: {e}")
+            if "sameSite" not in cookie or cookie["sameSite"] not in ["Strict", "Lax", "None"]:
+                cookie["sameSite"] = "Lax"
             
-            print("✅ Cookies successfully loaded!")
-        except FileNotFoundError:
-            print("⚠️ No cookies found. Logging in required.")
-            sys.exit("Exiting script because cookies file not found.")
-    else:
-        sys.exit("⚠️ Exiting script because no cookies found in the file, it is empty.")
+            if "expiry" not in cookie:
+                cookie["expiry"] = int(time.time()) + 3600 * 24 * 30  # 30 days expiry
+
+            try:
+                driver.add_cookie(cookie)
+            except Exception as e:
+                print(f"Failed to add cookie {cookie.get('name', 'unknown')}: {e}")
+        
+        print("✅ Cookies successfully loaded!")
+    except FileNotFoundError:
+        print("⚠️ No cookies found. Logging in required.")
+        sys.exit("Exiting script because cookies file not found.")
+
 
 def save_cookies(driver):
     with open(COOKIE_FILE, "w") as file:
