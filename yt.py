@@ -195,7 +195,7 @@ def load_cookies(driver):
     try:
         # with open(COOKIE_FILE, "r") as file:
         #     cookies = json.load(file)
-        cookies = json.load(os.environ.get('COOKIES'))
+        cookies = json.loads(os.environ.get('COOKIES'))
 
         driver.uc_open("https://www.youtube.com")  # Ensure correct domain is loaded before adding cookies
         wait_for_page_load(driver)
