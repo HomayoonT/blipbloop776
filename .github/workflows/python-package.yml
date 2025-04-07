@@ -25,13 +25,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install selenium seleniumbase pyautogui
+          pip install selenium seleniumbase
 
       - name: Install Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip libvulkan1
-          sudo apt-get install -y xvfb
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
           rm -f google-chrome-stable_current_amd64.deb
@@ -51,7 +50,7 @@ jobs:
             chrome-profile-
 
       - name: Run yt.py script
-        run: xvfb-run python yt.py
+        run: python yt.py
 
       - name: Save chrome_profile and youtube_cookies.json
         uses: actions/cache@v3
