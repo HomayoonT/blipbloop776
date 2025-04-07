@@ -4,6 +4,8 @@ import json
 import sys
 import os
 import threading
+import pyautogui
+import pygetwindow as gw
 from seleniumbase import Driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -357,6 +359,45 @@ def force_reset_video(driver, attempts=5):
 #     except Exception as e:
 #         print(f"⚠️ Could not ensure video is playing: {e}")
 
+def skip_ad_with_pyautogui(driver):
+    # Get currently active window — assumes browser is focused
+    window = gw.getActiveWindow()
+    if not window:
+        raise Exception("Unable to get active browser window.")
+    
+    window.activate()
+    browser_left = window.left
+    browser_top = window.top
+
+    try:
+        selector = "button.ytp-skip-ad-button"
+        if driver.is_element_visible(selector):
+            print("Skip button detected!")
+            time.sleep(2)  # Wait before clicking
+
+            # Get the skip button element
+            button = driver.find_element(selector)
+            location = button.location
+            size = button.size
+
+            # Estimate browser chrome height (tabs + URL bar)
+            window_inner_height = driver.execute_script("return window.innerHeight;")
+            full_window_height = driver.execute_script("return window.outerHeight;")
+            chrome_height = full_window_height - window_inner_height
+            print(f"Browser chrome height estimated: {chrome_height}px")
+
+            # Calculate screen coordinates properly
+            screen_x = browser_left + location['x'] + size['width'] // 2
+            screen_y = browser_top + chrome_height + location['y'] + size['height'] // 2
+
+            # Move and click
+            pyautogui.moveTo(screen_x, screen_y, duration=0.3)
+            pyautogui.click()
+            print("Clicked Skip Ad successfully.")
+    except Exception as e:
+        print("Error:", e)
+    time.sleep(1)
+
 def wait_for_playlist_videos(driver, timeout=15):
     try:
         WebDriverWait(driver, timeout).until(
@@ -459,9 +500,11 @@ def watch_playlist(driver, playlist_url):
                         if skip_button:
                             driver.execute_script("document.querySelector('.ytp-ad-skip-button').click();")
                             print("⏭️ Skip Ad button clicked!")
+                            skip_ad_with_pyautogui(driver)
                             time.sleep(1)
                         else:
                             print("⏳ Ad detected. Waiting for skip button or ad to finish...")
+                            skip_ad_with_pyautogui(driver)
                         time.sleep(1)
                         continue
 
