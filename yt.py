@@ -30,7 +30,7 @@ def get_driver():
     else:
         print("✅ Chrome profile exists")
     
-    driver = Driver(uc=True, headless=False, incognito=False, user_data_dir=CHROME_PROFILE_PATH)
+    driver = Driver(uc=True, headless=True, incognito=False, user_data_dir=CHROME_PROFILE_PATH)
 
     if is_new_profile:
         print("✅ Attempting to load cookies...")
