@@ -25,7 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install selenium seleniumbase
+          pip install selenium seleniumbase pyautogui
 
       - name: Install Chrome
         run: |
