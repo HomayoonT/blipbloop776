@@ -33,7 +33,7 @@ def get_driver():
     else:
         print("✅ Chrome profile exists")
         if os.path.exists(cached_profile_path):
-        shutil.copytree(cached_profile_path, temp_profile_path, dirs_exist_ok=True)
+            shutil.copytree(cached_profile_path, temp_profile_path, dirs_exist_ok=True)
         driver = Driver(uc=True, headless=True, incognito=False, user_data_dir=temp_profile_path)
     
 
